@@ -26,11 +26,11 @@ public class BinarySearchTree
             insert(x, root.getLeftChild());
     }
     
-    public boolean isEmpty()
+    public boolean contains(int x)
     {
-        return root.getLeftChild() == null;
+        return search(x, root.getLeftChild());
     }
-
+    
     public void display()
     {
     	preorderDisplay(root.getLeftChild());
@@ -40,123 +40,7 @@ public class BinarySearchTree
         postorderDisplay(root.getLeftChild());
         System.out.println();
     }
-    
-    public String toString()
-    {
-    	return toString(root.getLeftChild());
-    }
-    
-    private String toString(Node p)
-    {    	
-    	if (p != null)
-    	{
-    		return toString(p.getLeftChild()) +
-    				p.getInfo() + " " +
-    				toString(p.getRightChild());
-    	}
-    	else
-    	{
-    		return "";
-    	}
-    }
 
-    public boolean contains(int x)
-    {
-        return search(x, root.getLeftChild());
-    }
-
-    public int getMin()
-    {
-        return getMin(root.getLeftChild());
-    }
-    
-    private void preorderDisplay(Node p)
-    {
-    	if (p != null)
-        {
-    		if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
-    		preorderDisplay(p.getLeftChild());
-    		preorderDisplay(p.getRightChild());
-        }
-    }
-    
-    private void inorderDisplay(Node p)
-    {
-        if (p != null)
-        {
-            inorderDisplay(p.getLeftChild());
-            if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
-            inorderDisplay(p.getRightChild());
-        }
-    }
-    
-    private void postorderDisplay(Node p)
-    {
-    	if (p != null)
-        {
-            postorderDisplay(p.getLeftChild());
-            postorderDisplay(p.getRightChild());
-            if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
-        }
-    }
-
-    private boolean search(int x, Node p)
-    {
-        if (p == null)
-            return false;
-        else if (x == p.getInfo())
-            return true;
-        else if (x < p.getInfo())
-            return search(x, p.getLeftChild());
-        else
-            return search(x, p.getRightChild());
-    }
-
-    private void insert(int x, Node p)
-    {
-        if (x < p.getInfo())
-            if (p.getLeftChild() == null)
-            {
-                Node q = new Node();
-                q.setNode(x, null, null);
-                p.setLeftChild(q);
-            } else
-                insert(x, p.getLeftChild());
-        else if (p.getRightChild() == null)
-        {
-            Node q = new Node();
-            q.setNode(x, null, null);
-            p.setRightChild(q);
-        } else
-            insert(x, p.getRightChild());
-    }
-
-    private int getMin(Node p)
-    {
-        if (p.getLeftChild() == null)
-            return p.getInfo();
-        else
-            return getMin(p.getLeftChild());
-    }
-    
-    public int getHeight()
-    {
-    	return getHeight(root.getLeftChild());
-    }
-    
-    private int getHeight(Node p)
-    {
-    	if (p != null)
-    	{
-    		return 1 + Math.max(getHeight(p.getLeftChild()), 
-    							getHeight(p.getRightChild()));
-    	}
-    	else
-    	{
-    		return -1;
-    	}
-    }
-    
     public int getCount()
     {
     	return getCount(root.getLeftChild());
@@ -206,6 +90,24 @@ public class BinarySearchTree
     	}
     }
     
+    public int getHeight()
+    {
+    	return getHeight(root.getLeftChild());
+    }
+    
+    private int getHeight(Node p)
+    {
+    	if (p != null)
+    	{
+    		return 1 + Math.max(getHeight(p.getLeftChild()), 
+    							getHeight(p.getRightChild()));
+    	}
+    	else
+    	{
+    		return -1;
+    	}
+    }
+    
     public int getMax()
     {
     	return getMax(root.getLeftChild());
@@ -223,6 +125,73 @@ public class BinarySearchTree
     	}
     }
     
+    public int getMin()
+    {
+        return getMin(root.getLeftChild());
+    }
+    
+    private int getMin(Node p)
+    {
+        if (p.getLeftChild() == null)
+            return p.getInfo();
+        else
+            return getMin(p.getLeftChild());
+    }
+    
+    private void inorderDisplay(Node p)
+    {
+        if (p != null)
+        {
+            inorderDisplay(p.getLeftChild());
+            if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
+            inorderDisplay(p.getRightChild());
+        }
+    }
+    
+    private void insert(int x, Node p)
+    {
+        if (x < p.getInfo())
+            if (p.getLeftChild() == null)
+            {
+                Node q = new Node();
+                q.setNode(x, null, null);
+                p.setLeftChild(q);
+            } else
+                insert(x, p.getLeftChild());
+        else if (p.getRightChild() == null)
+        {
+            Node q = new Node();
+            q.setNode(x, null, null);
+            p.setRightChild(q);
+        } else
+            insert(x, p.getRightChild());
+    }
+    
+    public boolean isEmpty()
+    {
+        return root.getLeftChild() == null;
+    }
+    
+    private void postorderDisplay(Node p)
+    {
+    	if (p != null)
+        {
+            postorderDisplay(p.getLeftChild());
+            postorderDisplay(p.getRightChild());
+            if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
+        }
+    }
+
+    private void preorderDisplay(Node p)
+    {
+    	if (p != null)
+        {
+    		if (!p.isDeleted()) System.out.print(p.getInfo() + " ");
+    		preorderDisplay(p.getLeftChild());
+    		preorderDisplay(p.getRightChild());
+        }
+    }
+
     void remove(int x)
     {
     	remove(x, root.getLeftChild());
@@ -248,6 +217,37 @@ public class BinarySearchTree
 	    			remove(x, p.getRightChild());
 	    		}
     		}
+    	}
+    }
+    
+    private boolean search(int x, Node p)
+    {
+        if (p == null)
+            return false;
+        else if (x == p.getInfo())
+            return true;
+        else if (x < p.getInfo())
+            return search(x, p.getLeftChild());
+        else
+            return search(x, p.getRightChild());
+    }
+    
+    public String toString()
+    {
+    	return toString(root.getLeftChild());
+    }
+    
+    private String toString(Node p)
+    {    	
+    	if (p != null)
+    	{
+    		return toString(p.getLeftChild()) +
+    				p.getInfo() + " " +
+    				toString(p.getRightChild());
+    	}
+    	else
+    	{
+    		return "";
     	}
     }
 }

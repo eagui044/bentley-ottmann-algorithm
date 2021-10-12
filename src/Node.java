@@ -17,13 +17,6 @@ public class Node
         isDeleted = false;
     }
 
-    public void setNode(int x, Node l, Node r)
-    {
-        info = x;
-        left = l;
-        right = r;
-    }
-
     public int getInfo()
     {
         return info;
@@ -38,10 +31,15 @@ public class Node
     {
         return right;
     }
-    
+
     public boolean isDeleted()
     {
     	return isDeleted;
+    }
+    
+    public void setDeleted(boolean delete)
+    {
+    	isDeleted = delete;
     }
 
     public void setInfo(int x)
@@ -54,13 +52,15 @@ public class Node
         left = l;
     }
 
-    public void setRightChild(Node r)
+    public void setNode(int x, Node l, Node r)
     {
+        info = x;
+        left = l;
         right = r;
     }
     
-    public void setDeleted(boolean delete)
+    public void setRightChild(Node r)
     {
-    	isDeleted = delete;
+        right = r;
     }
 }
