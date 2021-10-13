@@ -1,66 +1,69 @@
 /**
-* @author A. Hernandez
-* @author E. Aguilar,
-* adaptation from Data Structures class (COP 3530)
-*/
+ * @author E. Aguilar, adaptation from Data Structures class (COP 3530)
+ * @author A. Hernandez
+ *         <p>
+ *         This is a special Node object for a {@link BinarySearchTree} which is specialized for ordering
+ *         {@link LineSegment} objects.
+ *         </p>
+ */
 public class Node
 {
-	private int info;     //element stored in this node
-    private Node left;    //link to left child
-    private Node right;   //link to right child
-    private boolean isDeleted; //deleted node flag
+	private LineSegment lineSegment; // Line segment held by this node
+	private Node left; // Link to left child
+	private Node right; // Link to right child
+	private boolean isDeleted; // Deleted node flag
 
-    Node()
-    {
-        info = 0;
-        left = right = null;
-        isDeleted = false;
-    }
+	public Node()
+	{
+		lineSegment = null;
+		left = right = null;
+		isDeleted = false;
+	}
 
-    public int getInfo()
-    {
-        return info;
-    }
+	public LineSegment getInfo()
+	{
+		return lineSegment;
+	}
 
-    public Node getLeftChild()
-    {
-        return left;
-    }
+	public Node getLeftChild()
+	{
+		return left;
+	}
 
-    public Node getRightChild()
-    {
-        return right;
-    }
+	public Node getRightChild()
+	{
+		return right;
+	}
 
-    public boolean isDeleted()
-    {
-    	return isDeleted;
-    }
-    
-    public void setDeleted(boolean delete)
-    {
-    	isDeleted = delete;
-    }
+	public boolean isDeleted()
+	{
+		return isDeleted;
+	}
 
-    public void setInfo(int x)
-    {
-        info = x;
-    }
+	public void setDeleted(boolean delete)
+	{
+		isDeleted = delete;
+	}
 
-    public void setLeftChild(Node l)
-    {
-        left = l;
-    }
+	public void setInfo(LineSegment s)
+	{
+		lineSegment = s;
+	}
 
-    public void setNode(int x, Node l, Node r)
-    {
-        info = x;
-        left = l;
-        right = r;
-    }
-    
-    public void setRightChild(Node r)
-    {
-        right = r;
-    }
+	public void setLeftChild(Node l)
+	{
+		left = l;
+	}
+
+	public void setNode(LineSegment s, Node l, Node r)
+	{
+		lineSegment = s;
+		left = l;
+		right = r;
+	}
+
+	public void setRightChild(Node r)
+	{
+		right = r;
+	}
 }
