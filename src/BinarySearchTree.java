@@ -25,7 +25,7 @@ public class BinarySearchTree
 		if (root.getLeftChild() == null)
 		{
 			Node first = new Node();
-			first.setNode(s, null, null, null);
+			first.setNode(s, null, null, null, null, null);
 			root.setLeftChild(first);
 		} else
 		{
@@ -142,10 +142,7 @@ public class BinarySearchTree
 		if (p != null)
 		{
 			inorderDisplay(p.getLeftChild());
-			if (!p.isDeleted())
-			{
-				System.out.print(p.getInfo() + " ");
-			}
+			System.out.print(p.getInfo() + " ");
 			inorderDisplay(p.getRightChild());
 		}
 	}
@@ -157,7 +154,7 @@ public class BinarySearchTree
 			if (p.getLeftChild() == null)
 			{
 				Node newChild = new Node();
-				newChild.setNode(s, p, null, null);
+				newChild.setNode(s, p, null, null, null, null);
 				p.setLeftChild(newChild);
 				newChild.setPredecessor(findInorderPredecessorOf(newChild));
 				newChild.setSuccessor(findInorderSuccessorOf(newChild));
@@ -180,7 +177,7 @@ public class BinarySearchTree
 			if (p.getRightChild() == null)
 			{
 				Node newChild = new Node();
-				newChild.setNode(s, p, null, null);
+				newChild.setNode(s, p, null, null, null, null);
 				p.setRightChild(newChild);
 				newChild.setPredecessor(findInorderPredecessorOf(newChild));
 				newChild.setSuccessor(findInorderSuccessorOf(newChild));
@@ -212,10 +209,7 @@ public class BinarySearchTree
 		{
 			postorderDisplay(p.getLeftChild());
 			postorderDisplay(p.getRightChild());
-			if (!p.isDeleted())
-			{
-				System.out.print(p.getInfo() + " ");
-			}
+			System.out.print(p.getInfo() + " ");
 		}
 	}
 
@@ -223,10 +217,7 @@ public class BinarySearchTree
 	{
 		if (p != null)
 		{
-			if (!p.isDeleted())
-			{
-				System.out.print(p.getInfo() + " ");
-			}
+			System.out.print(p.getInfo() + " ");
 			preorderDisplay(p.getLeftChild());
 			preorderDisplay(p.getRightChild());
 		}
@@ -234,16 +225,47 @@ public class BinarySearchTree
 
 	public void remove(LineSegment s)
 	{
-		remove(s, root.getLeftChild());
+		remove(s, root.getLeftChild(), true);
 	}
 
-	private void remove(LineSegment s, Node p)
+	private void remove(LineSegment s, Node p, boolean deleteDuplicates)
 	{
 		if (p != null)
 		{
 			if (s.compareTo(p.getInfo()) == 0)
 			{
-				p.setDeleted(true);
+				if (p.getLeftChild() == null && p.getRightChild() == null)
+				{
+					// If node is a leaf node (no children), simply remove node.
+					if (p == p.getParent().getLeftChild())
+					{
+						p.getParent().setLeftChild(null);
+					} else
+					{
+						p.getParent().setRightChild(null);
+					}
+				} else if (p.getRightChild() == null)
+				{
+					// If node only has left child, copy child to parent, and delete child.
+					Node child = p.getLeftChild();
+					p.setNode(child.getInfo(), child.getParent(), child.getLeftChild(), child.getRightChild(), child.getPredecessor(), child.getSuccessor());
+					
+					remove(child.getInfo(), child, false);
+				} else if (p.getLeftChild() == null)
+				{
+					// If node only has right child, copy child to parent, and delete child.
+					Node child = p.getRightChild();
+					p.setNode(child.getInfo(), child.getParent(), child.getLeftChild(), child.getRightChild(), child.getPredecessor(), child.getSuccessor());
+					
+					remove(child.getInfo(), child, false);
+				} else
+				{
+					// If node has both left child and right child, copy inorder successor of this node to it, and delete successor.
+					Node successor = p.getSuccessor();	
+					p.setNode(successor.getInfo(), successor.getParent(), successor.getLeftChild(), successor.getRightChild(), successor.getPredecessor(), successor.getSuccessor());
+					
+					remove(successor.getInfo(), successor, false);
+				}
 
 				if (p.getPredecessor() != null)
 				{
@@ -255,13 +277,16 @@ public class BinarySearchTree
 					p.getSuccessor().setPredecessor(p.getPredecessor());
 				}
 
-				remove(s, p.getRightChild());
+				if (deleteDuplicates)
+				{
+					remove(s, p.getRightChild(), true);
+				}
 			} else if (s.compareTo(p.getInfo()) == -1)
 			{
-				remove(s, p.getLeftChild());
+				remove(s, p.getLeftChild(), true);
 			} else
 			{
-				remove(s, p.getRightChild());
+				remove(s, p.getRightChild(), true);
 			}
 		}
 	}

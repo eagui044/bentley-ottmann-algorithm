@@ -12,16 +12,14 @@ public class Node
 	private Node parent; // Link to parent node above
 	private Node left; // Link to left child
 	private Node right; // Link to right child
-	private Node successor; // Link to inorder successor of this node.
 	private Node predecessor; // Link to inorder predecessor of this node.
-	private boolean isDeleted; // Deleted node flag
+	private Node successor; // Link to inorder successor of this node.
 
 	public Node()
 	{
 		segment = null;
 		parent = left = right = null;
-		successor = predecessor = null;
-		isDeleted = false;
+		predecessor = successor = null;
 	}
 
 	public LineSegment getInfo()
@@ -54,16 +52,6 @@ public class Node
 		return successor;
 	}
 
-	public boolean isDeleted()
-	{
-		return isDeleted;
-	}
-
-	public void setDeleted(boolean delete)
-	{
-		isDeleted = delete;
-	}
-
 	public void setInfo(LineSegment segment)
 	{
 		this.segment = segment;
@@ -74,11 +62,13 @@ public class Node
 		this.left = left;
 	}
 
-	public void setNode(LineSegment segment, Node parent, Node left, Node right)
+	public void setNode(LineSegment segment, Node parent, Node left, Node right, Node predecessor, Node successor)
 	{
 		this.segment = segment;
 		this.left = left;
 		this.right = right;
+		this.predecessor = predecessor;
+		this.successor = successor;
 	}
 
 	public void setParent(Node parent)
