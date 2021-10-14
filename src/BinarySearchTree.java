@@ -4,7 +4,7 @@
  *         <p>
  *         This is a Binary Search Tree which is specialized for ordering geometric {@link LineSegment} objects, the
  *         line segments are ordered based on whether they are above or below each other using the y-coordinates of
- *         their endpoints. Successor and antecessor {@link Node} objects which contain the line segments can be
+ *         their endpoints. Successor and predecessor {@link Node} objects which contain the line segments can be
  *         retrieved in constant time.
  *         </p>
  */
@@ -24,9 +24,9 @@ public class BinarySearchTree
 	{
 		if (root.getLeftChild() == null)
 		{
-			Node p = new Node();
-			p.setNode(s, null, null);
-			root.setLeftChild(p);
+			Node first = new Node();
+			first.setNode(s, null, null, null);
+			root.setLeftChild(first);
 		} else
 		{
 			insert(s, root.getLeftChild());
@@ -156,9 +156,21 @@ public class BinarySearchTree
 		{
 			if (p.getLeftChild() == null)
 			{
-				Node q = new Node();
-				q.setNode(s, null, null);
-				p.setLeftChild(q);
+				Node newChild = new Node();
+				newChild.setNode(s, p, null, null);
+				p.setLeftChild(newChild);
+				newChild.setPredecessor(findInorderPredecessorOf(newChild));
+				newChild.setSuccessor(findInorderSuccessorOf(newChild));
+
+				if (newChild.getPredecessor() != null)
+				{
+					newChild.getPredecessor().setSuccessor(newChild);
+				}
+
+				if (newChild.getSuccessor() != null)
+				{
+					newChild.getSuccessor().setPredecessor(newChild);
+				}
 			} else
 			{
 				insert(s, p.getLeftChild());
@@ -167,9 +179,21 @@ public class BinarySearchTree
 		{
 			if (p.getRightChild() == null)
 			{
-				Node q = new Node();
-				q.setNode(s, null, null);
-				p.setRightChild(q);
+				Node newChild = new Node();
+				newChild.setNode(s, p, null, null);
+				p.setRightChild(newChild);
+				newChild.setPredecessor(findInorderPredecessorOf(newChild));
+				newChild.setSuccessor(findInorderSuccessorOf(newChild));
+
+				if (newChild.getPredecessor() != null)
+				{
+					newChild.getPredecessor().setSuccessor(newChild);
+				}
+
+				if (newChild.getSuccessor() != null)
+				{
+					newChild.getSuccessor().setPredecessor(newChild);
+				}
 			} else
 			{
 				insert(s, p.getRightChild());
@@ -220,6 +244,17 @@ public class BinarySearchTree
 			if (s.compareTo(p.getInfo()) == 0)
 			{
 				p.setDeleted(true);
+
+				if (p.getPredecessor() != null)
+				{
+					p.getPredecessor().setSuccessor(p.getSuccessor());
+				}
+
+				if (p.getSuccessor() != null)
+				{
+					p.getSuccessor().setPredecessor(p.getPredecessor());
+				}
+
 				remove(s, p.getRightChild());
 			} else if (s.compareTo(p.getInfo()) == -1)
 			{
@@ -262,5 +297,77 @@ public class BinarySearchTree
 		{
 			return "";
 		}
+	}
+
+	private Node findInorderSuccessorOf(Node p)
+	{
+		if (p.getRightChild() != null)
+		{
+			// If right subtree exists, then successor is its minimum node.
+			return findMinNodeFrom(p.getRightChild());
+		} else
+		{
+			// If right subtree does not exist, then successor is found in ancestor node, unless this node is the max.
+			// Climb up ancestors using parent link, until you find a node whose parent's right child is not equal to
+			// it, that parent is the successor.
+			Node child = p;
+			Node parent = child.getParent();
+
+			while (parent != null && child == parent.getRightChild())
+			{
+				child = parent;
+				parent = parent.getParent();
+			}
+
+			return parent;
+		}
+	}
+
+	private Node findInorderPredecessorOf(Node p)
+	{
+		if (p.getLeftChild() != null)
+		{
+			// If left subtree exists, then predecessor is its maximum node.
+			return findMaxNodeFrom(p.getLeftChild());
+		} else
+		{
+			// If left subtree does not exist, then predecessor is found in ancestor node, unless this node is the min.
+			// Climb up ancestors using parent link, until you find a node whose parent's left child is not equal to
+			// it, that parent is the predecessor.
+			Node child = p;
+			Node parent = child.getParent();
+
+			while (parent != null && child == parent.getLeftChild())
+			{
+				child = parent;
+				parent = parent.getParent();
+			}
+
+			return parent;
+		}
+	}
+
+	private Node findMinNodeFrom(Node p)
+	{
+		Node current = p;
+
+		while (current.getLeftChild() != null)
+		{
+			current = current.getLeftChild();
+		}
+
+		return current;
+	}
+
+	private Node findMaxNodeFrom(Node p)
+	{
+		Node current = p;
+
+		while (current.getRightChild() != null)
+		{
+			current = current.getRightChild();
+		}
+
+		return current;
 	}
 }

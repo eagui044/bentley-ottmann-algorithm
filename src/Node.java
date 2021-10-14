@@ -8,21 +8,25 @@
  */
 public class Node
 {
-	private LineSegment lineSegment; // Line segment held by this node
+	private LineSegment segment; // Line segment held by this node
+	private Node parent; // Link to parent node above
 	private Node left; // Link to left child
 	private Node right; // Link to right child
+	private Node successor; // Link to inorder successor of this node.
+	private Node predecessor; // Link to inorder predecessor of this node.
 	private boolean isDeleted; // Deleted node flag
 
 	public Node()
 	{
-		lineSegment = null;
-		left = right = null;
+		segment = null;
+		parent = left = right = null;
+		successor = predecessor = null;
 		isDeleted = false;
 	}
 
 	public LineSegment getInfo()
 	{
-		return lineSegment;
+		return segment;
 	}
 
 	public Node getLeftChild()
@@ -30,9 +34,24 @@ public class Node
 		return left;
 	}
 
+	public Node getParent()
+	{
+		return parent;
+	}
+
+	public Node getPredecessor()
+	{
+		return predecessor;
+	}
+
 	public Node getRightChild()
 	{
 		return right;
+	}
+
+	public Node getSuccessor()
+	{
+		return successor;
 	}
 
 	public boolean isDeleted()
@@ -45,25 +64,40 @@ public class Node
 		isDeleted = delete;
 	}
 
-	public void setInfo(LineSegment s)
+	public void setInfo(LineSegment segment)
 	{
-		lineSegment = s;
+		this.segment = segment;
 	}
 
-	public void setLeftChild(Node l)
+	public void setLeftChild(Node left)
 	{
-		left = l;
+		this.left = left;
 	}
 
-	public void setNode(LineSegment s, Node l, Node r)
+	public void setNode(LineSegment segment, Node parent, Node left, Node right)
 	{
-		lineSegment = s;
-		left = l;
-		right = r;
+		this.segment = segment;
+		this.left = left;
+		this.right = right;
 	}
 
-	public void setRightChild(Node r)
+	public void setParent(Node parent)
 	{
-		right = r;
+		this.parent = parent;
+	}
+
+	public void setPredecessor(Node predecessor)
+	{
+		this.predecessor = predecessor;
+	}
+
+	public void setRightChild(Node right)
+	{
+		this.right = right;
+	}
+
+	public void setSuccessor(Node successor)
+	{
+		this.successor = successor;
 	}
 }
