@@ -48,6 +48,78 @@ public class BinarySearchTree
 		System.out.println();
 	}
 
+	private Node findInorderPredecessorOf(Node p)
+	{
+		if (p.getLeftChild() != null)
+		{
+			// If left subtree exists, then predecessor is its maximum node.
+			return findMaxNodeFrom(p.getLeftChild());
+		} else
+		{
+			// If left subtree does not exist, then predecessor is found in ancestor node, unless this node is the min.
+			// Climb up ancestors using parent link, until you find a node whose parent's left child is not equal to
+			// it, that parent is the predecessor.
+			Node child = p;
+			Node parent = child.getParent();
+
+			while (parent != null && child == parent.getLeftChild())
+			{
+				child = parent;
+				parent = parent.getParent();
+			}
+
+			return parent;
+		}
+	}
+
+	private Node findInorderSuccessorOf(Node p)
+	{
+		if (p.getRightChild() != null)
+		{
+			// If right subtree exists, then successor is its minimum node.
+			return findMinNodeFrom(p.getRightChild());
+		} else
+		{
+			// If right subtree does not exist, then successor is found in ancestor node, unless this node is the max.
+			// Climb up ancestors using parent link, until you find a node whose parent's right child is not equal to
+			// it, that parent is the successor.
+			Node child = p;
+			Node parent = child.getParent();
+
+			while (parent != null && child == parent.getRightChild())
+			{
+				child = parent;
+				parent = parent.getParent();
+			}
+
+			return parent;
+		}
+	}
+
+	private Node findMaxNodeFrom(Node p)
+	{
+		Node current = p;
+
+		while (current.getRightChild() != null)
+		{
+			current = current.getRightChild();
+		}
+
+		return current;
+	}
+
+	private Node findMinNodeFrom(Node p)
+	{
+		Node current = p;
+
+		while (current.getLeftChild() != null)
+		{
+			current = current.getLeftChild();
+		}
+
+		return current;
+	}
+
 	public int getCount()
 	{
 		return getCount(root.getLeftChild());
@@ -147,6 +219,20 @@ public class BinarySearchTree
 		}
 	}
 
+	public void inorderPredecessorSuccessorTraversal()
+	{
+		if (root.getLeftChild() != null)
+		{
+			Node current = findMinNodeFrom(root.getLeftChild());
+
+			while (current != null)
+			{
+				System.out.println(current.getInfo());
+				current = current.getSuccessor();
+			}
+		}
+	}
+
 	private void insert(LineSegment s, Node p)
 	{
 		if (s.compareTo(p.getInfo()) == -1) // If < current node, insert left.
@@ -159,6 +245,7 @@ public class BinarySearchTree
 				newChild.setPredecessor(findInorderPredecessorOf(newChild));
 				newChild.setSuccessor(findInorderSuccessorOf(newChild));
 
+				// Update successors and predecessors after insertion of new node.
 				if (newChild.getPredecessor() != null)
 				{
 					newChild.getPredecessor().setSuccessor(newChild);
@@ -182,6 +269,7 @@ public class BinarySearchTree
 				newChild.setPredecessor(findInorderPredecessorOf(newChild));
 				newChild.setSuccessor(findInorderSuccessorOf(newChild));
 
+				// Update successors and predecessors after insertion of new node.
 				if (newChild.getPredecessor() != null)
 				{
 					newChild.getPredecessor().setSuccessor(newChild);
@@ -225,70 +313,72 @@ public class BinarySearchTree
 
 	public void remove(LineSegment s)
 	{
-		remove(s, root.getLeftChild(), true);
+		root.setLeftChild(remove(s, root.getLeftChild()));
 	}
 
-	private void remove(LineSegment s, Node p, boolean deleteDuplicates)
+	private Node remove(LineSegment s, Node p)
 	{
-		if (p != null)
+		// If tree is empty.
+		if (p == null)
 		{
-			if (s.compareTo(p.getInfo()) == 0)
-			{
-				if (p.getLeftChild() == null && p.getRightChild() == null)
-				{
-					// If node is a leaf node (no children), simply remove node.
-					if (p == p.getParent().getLeftChild())
-					{
-						p.getParent().setLeftChild(null);
-					} else
-					{
-						p.getParent().setRightChild(null);
-					}
-				} else if (p.getRightChild() == null)
-				{
-					// If node only has left child, copy child to parent, and delete child.
-					Node child = p.getLeftChild();
-					p.setNode(child.getInfo(), child.getParent(), child.getLeftChild(), child.getRightChild(), child.getPredecessor(), child.getSuccessor());
-					
-					remove(child.getInfo(), child, false);
-				} else if (p.getLeftChild() == null)
-				{
-					// If node only has right child, copy child to parent, and delete child.
-					Node child = p.getRightChild();
-					p.setNode(child.getInfo(), child.getParent(), child.getLeftChild(), child.getRightChild(), child.getPredecessor(), child.getSuccessor());
-					
-					remove(child.getInfo(), child, false);
-				} else
-				{
-					// If node has both left child and right child, copy inorder successor of this node to it, and delete successor.
-					Node successor = p.getSuccessor();	
-					p.setNode(successor.getInfo(), successor.getParent(), successor.getLeftChild(), successor.getRightChild(), successor.getPredecessor(), successor.getSuccessor());
-					
-					remove(successor.getInfo(), successor, false);
-				}
+			return p;
+		} else if (s.compareTo(p.getInfo()) == -1)
+		{
+			p.setLeftChild(remove(s, p.getLeftChild()));
 
-				if (p.getPredecessor() != null)
-				{
-					p.getPredecessor().setSuccessor(p.getSuccessor());
-				}
-
-				if (p.getSuccessor() != null)
-				{
-					p.getSuccessor().setPredecessor(p.getPredecessor());
-				}
-
-				if (deleteDuplicates)
-				{
-					remove(s, p.getRightChild(), true);
-				}
-			} else if (s.compareTo(p.getInfo()) == -1)
+			if (p.getLeftChild() != null)
 			{
-				remove(s, p.getLeftChild(), true);
-			} else
+				p.getLeftChild().setParent(p);
+			}
+		} else if (s.compareTo(p.getInfo()) == 1)
+		{
+			p.setRightChild(remove(s, p.getRightChild()));
+
+			if (p.getRightChild() != null)
 			{
-				remove(s, p.getRightChild(), true);
+				p.getRightChild().setParent(p);
+			}
+		} else
+		{ // If matching LineSegment is found.
+
+			// Update successors and predecessors before deletion of node.
+			if (p.getPredecessor() != null)
+			{
+				p.getPredecessor().setSuccessor(p.getSuccessor());
+			}
+
+			if (p.getSuccessor() != null)
+			{
+				p.getSuccessor().setPredecessor(p.getPredecessor());
+			}
+
+			// Node with only one child or no child.
+			if (p.getLeftChild() == null)
+			{
+				return p.getRightChild();
+			} else if (p.getRightChild() == null)
+			{
+				return p.getLeftChild();
+			}
+
+			// If node has both children, copy inorder successor to it, and remove successor.
+			Node successor = findInorderSuccessorOf(p);
+
+			// Copy contents of successor to node.
+			p.setInfo(successor.getInfo());
+			p.setPredecessor(successor.getPredecessor());
+			p.setSuccessor(successor.getSuccessor());
+
+			// Remove the inorder successor.
+			p.setRightChild(remove(p.getInfo(), p.getRightChild()));
+
+			if (p.getRightChild() != null)
+			{
+				p.getRightChild().setParent(p);
 			}
 		}
+
+		return p;
 	}
 
 	private boolean search(LineSegment s, Node p)
@@ -317,82 +407,10 @@ public class BinarySearchTree
 	{
 		if (p != null)
 		{
-			return toString(p.getLeftChild()) + " " + p.getInfo() + " " + toString(p.getRightChild());
+			return toString(p.getLeftChild()) + p.getInfo() + "\n" + toString(p.getRightChild());
 		} else
 		{
 			return "";
 		}
-	}
-
-	private Node findInorderSuccessorOf(Node p)
-	{
-		if (p.getRightChild() != null)
-		{
-			// If right subtree exists, then successor is its minimum node.
-			return findMinNodeFrom(p.getRightChild());
-		} else
-		{
-			// If right subtree does not exist, then successor is found in ancestor node, unless this node is the max.
-			// Climb up ancestors using parent link, until you find a node whose parent's right child is not equal to
-			// it, that parent is the successor.
-			Node child = p;
-			Node parent = child.getParent();
-
-			while (parent != null && child == parent.getRightChild())
-			{
-				child = parent;
-				parent = parent.getParent();
-			}
-
-			return parent;
-		}
-	}
-
-	private Node findInorderPredecessorOf(Node p)
-	{
-		if (p.getLeftChild() != null)
-		{
-			// If left subtree exists, then predecessor is its maximum node.
-			return findMaxNodeFrom(p.getLeftChild());
-		} else
-		{
-			// If left subtree does not exist, then predecessor is found in ancestor node, unless this node is the min.
-			// Climb up ancestors using parent link, until you find a node whose parent's left child is not equal to
-			// it, that parent is the predecessor.
-			Node child = p;
-			Node parent = child.getParent();
-
-			while (parent != null && child == parent.getLeftChild())
-			{
-				child = parent;
-				parent = parent.getParent();
-			}
-
-			return parent;
-		}
-	}
-
-	private Node findMinNodeFrom(Node p)
-	{
-		Node current = p;
-
-		while (current.getLeftChild() != null)
-		{
-			current = current.getLeftChild();
-		}
-
-		return current;
-	}
-
-	private Node findMaxNodeFrom(Node p)
-	{
-		Node current = p;
-
-		while (current.getRightChild() != null)
-		{
-			current = current.getRightChild();
-		}
-
-		return current;
 	}
 }

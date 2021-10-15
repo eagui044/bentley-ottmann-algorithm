@@ -65,6 +65,7 @@ public class Node
 	public void setNode(LineSegment segment, Node parent, Node left, Node right, Node predecessor, Node successor)
 	{
 		this.segment = segment;
+		this.parent = parent;
 		this.left = left;
 		this.right = right;
 		this.predecessor = predecessor;

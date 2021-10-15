@@ -271,6 +271,6 @@ public class LineSegment implements Comparable<LineSegment>
 
 	public String toString()
 	{
-		return "{" + p1 + ", " + p2 + "}";
+		return "LineSegment: {" + p1 + ", " + p2 + "}";
 	}
 }
