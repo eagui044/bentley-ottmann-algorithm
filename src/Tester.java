@@ -10,8 +10,8 @@ public class Tester
 	public Tester()
 	{
 		BinarySearchTree bst = new BinarySearchTree();
-		Random rand = new Random(0);
-		int segmentCount = 20;
+		Random rand = new Random(1);
+		int segmentCount = 25;
 		int coordinateRange = 25;
 
 		LineSegment[] segments = new LineSegment[segmentCount];
@@ -35,13 +35,12 @@ public class Tester
 		System.out.println();
 
 		System.out.println(bst);
-		System.out.println();
 
 		for (int i = 0; i < segmentCount; i++)
 		{
+			System.out.println("Removing: " + segments[i]);
 			bst.remove(segments[i]);
 			System.out.println(bst);
-			System.out.println();
 		}
 
 		// Generate random line segments to insert into tree.
@@ -57,19 +56,27 @@ public class Tester
 
 			bst.add(segment);
 			segments[i] = segment;
+			// System.out.println(segment);
 		}
 
-		System.out.println("Constant time access predecessor and successor test:");
+		System.out.println("\n---------------------------------------------------------------------------------------");
+		System.out.println("Constant time access predecessor and successor test, "
+				+ "inorder traversal using only successor and predecessor links:");
 		System.out.println();
 
-		System.out.println("Inorder traversal using only successor and predecessor links:");
-		bst.inorderPredecessorSuccessorTraversal();
+		System.out.println("Inorder Display:");
+		bst.inorderPredecessorSuccessorDisplay(false);
+		System.out.println();
+
+		System.out.println("Reversed Inorder Display:");
+		bst.inorderPredecessorSuccessorDisplay(true);
 		System.out.println();
 
 		for (int i = 0; i < segmentCount; i++)
 		{
+			System.out.println("Removing: " + segments[i]);
 			bst.remove(segments[i]);
-			bst.inorderPredecessorSuccessorTraversal();
+			bst.inorderPredecessorSuccessorDisplay(false);
 			System.out.println();
 		}
 	}

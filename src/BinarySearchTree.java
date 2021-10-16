@@ -120,6 +120,23 @@ public class BinarySearchTree
 		return current;
 	}
 
+	private Node findNode(LineSegment s, Node p)
+	{
+		if (p == null)
+		{
+			return null;
+		} else if (s.compareTo(p.getInfo()) == 0)
+		{
+			return p;
+		} else if (s.compareTo(p.getInfo()) == -1)
+		{
+			return findNode(s, p.getLeftChild());
+		} else
+		{
+			return findNode(s, p.getRightChild());
+		}
+	}
+
 	public int getCount()
 	{
 		return getCount(root.getLeftChild());
@@ -219,16 +236,28 @@ public class BinarySearchTree
 		}
 	}
 
-	public void inorderPredecessorSuccessorTraversal()
+	public void inorderPredecessorSuccessorDisplay(boolean reversed)
 	{
 		if (root.getLeftChild() != null)
 		{
-			Node current = findMinNodeFrom(root.getLeftChild());
-
-			while (current != null)
+			if (!reversed)
 			{
-				System.out.println(current.getInfo());
-				current = current.getSuccessor();
+				Node current = findMinNodeFrom(root.getLeftChild());
+
+				while (current != null)
+				{
+					System.out.println(current.getInfo());
+					current = current.getSuccessor();
+				}
+			} else
+			{
+				Node current = findMaxNodeFrom(root.getLeftChild());
+
+				while (current != null)
+				{
+					System.out.println(current.getInfo());
+					current = current.getPredecessor();
+				}
 			}
 		}
 	}
@@ -313,7 +342,28 @@ public class BinarySearchTree
 
 	public void remove(LineSegment s)
 	{
-		root.setLeftChild(remove(s, root.getLeftChild()));
+		Node p = findNode(s, root.getLeftChild());
+
+		if (p != null)
+		{
+			// Update successors and predecessors before deletion of node.
+			if (p.getPredecessor() != null)
+			{
+				p.getPredecessor().setSuccessor(p.getSuccessor());
+			}
+
+			if (p.getSuccessor() != null)
+			{
+				p.getSuccessor().setPredecessor(p.getPredecessor());
+			}
+
+			root.setLeftChild(remove(s, root.getLeftChild()));
+
+			if (root.getLeftChild() != null)
+			{
+				root.getLeftChild().setParent(null);
+			}
+		}
 	}
 
 	private Node remove(LineSegment s, Node p)
@@ -341,40 +391,51 @@ public class BinarySearchTree
 		} else
 		{ // If matching LineSegment is found.
 
-			// Update successors and predecessors before deletion of node.
-			if (p.getPredecessor() != null)
+			// Node with no child.
+			if (p.getLeftChild() == null && p.getRightChild() == null)
 			{
-				p.getPredecessor().setSuccessor(p.getSuccessor());
-			}
-
-			if (p.getSuccessor() != null)
-			{
-				p.getSuccessor().setPredecessor(p.getPredecessor());
-			}
-
-			// Node with only one child or no child.
-			if (p.getLeftChild() == null)
+				return null;
+			} else if (p.getLeftChild() == null) // Node with only a right child.
 			{
 				return p.getRightChild();
-			} else if (p.getRightChild() == null)
+			} else if (p.getRightChild() == null) // Node with only a left child.
 			{
 				return p.getLeftChild();
-			}
-
-			// If node has both children, copy inorder successor to it, and remove successor.
-			Node successor = findInorderSuccessorOf(p);
-
-			// Copy contents of successor to node.
-			p.setInfo(successor.getInfo());
-			p.setPredecessor(successor.getPredecessor());
-			p.setSuccessor(successor.getSuccessor());
-
-			// Remove the inorder successor.
-			p.setRightChild(remove(p.getInfo(), p.getRightChild()));
-
-			if (p.getRightChild() != null)
+			} else // If node has both children, copy inorder successor contents to it, and remove successor.
 			{
-				p.getRightChild().setParent(p);
+				Node successor = findInorderSuccessorOf(p);
+
+				// TODO finish deleting testing code.
+				// System.out.println("Test Successor: " + successor.getInfo());
+				// System.out.println("Test Successor.predecessor: " + successor.getPredecessor());
+				// System.out.println("Test Successor.successor: " + successor.getSuccessor());
+				// if (successor.getPredecessor() != null)
+				// System.out.println("Test Successor.predecessor: " + successor.getPredecessor().getInfo());
+				// if (successor.getSuccessor() != null)
+				// System.out.println("Test Successor.successor: " + successor.getSuccessor().getInfo());
+
+				// Copy contents of successor to node.
+				p.setInfo(successor.getInfo());
+				p.setPredecessor(successor.getPredecessor());
+				p.setSuccessor(successor.getSuccessor());
+
+				if (p.getPredecessor() != null)
+				{
+					p.getPredecessor().setSuccessor(p);
+				}
+
+				if (p.getSuccessor() != null)
+				{
+					p.getSuccessor().setPredecessor(p);
+				}
+
+				// Remove the inorder successor.
+				p.setRightChild(remove(p.getInfo(), p.getRightChild()));
+
+				if (p.getRightChild() != null)
+				{
+					p.getRightChild().setParent(p);
+				}
 			}
 		}
 
