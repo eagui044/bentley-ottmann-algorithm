@@ -120,6 +120,11 @@ public class BinarySearchTree
 		return current;
 	}
 
+	public Node findNode(LineSegment s)
+	{
+		return findNode(s, root.getLeftChild());
+	}
+
 	private Node findNode(LineSegment s, Node p)
 	{
 		if (p == null)
@@ -199,7 +204,7 @@ public class BinarySearchTree
 		return getMax(root.getLeftChild());
 	}
 
-	public LineSegment getMax(Node p)
+	private LineSegment getMax(Node p)
 	{
 		if (p.getRightChild() == null)
 		{
@@ -208,6 +213,11 @@ public class BinarySearchTree
 		{
 			return getMax(p.getRightChild());
 		}
+	}
+
+	public Node getMaxNode()
+	{
+		return findMaxNodeFrom(root.getLeftChild());
 	}
 
 	public LineSegment getMin()
@@ -226,6 +236,11 @@ public class BinarySearchTree
 		}
 	}
 
+	public Node getMinNode()
+	{
+		return findMinNodeFrom(root.getLeftChild());
+	}
+
 	private void inorderDisplay(Node p)
 	{
 		if (p != null)
@@ -238,11 +253,11 @@ public class BinarySearchTree
 
 	public void inorderPredecessorSuccessorDisplay(boolean reversed)
 	{
-		if (root.getLeftChild() != null)
+		if (!this.isEmpty())
 		{
 			if (!reversed)
 			{
-				Node current = findMinNodeFrom(root.getLeftChild());
+				Node current = getMinNode();
 
 				while (current != null)
 				{
@@ -251,7 +266,7 @@ public class BinarySearchTree
 				}
 			} else
 			{
-				Node current = findMaxNodeFrom(root.getLeftChild());
+				Node current = getMaxNode();
 
 				while (current != null)
 				{
