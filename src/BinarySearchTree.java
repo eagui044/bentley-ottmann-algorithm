@@ -1,5 +1,5 @@
 /**
- * @author E. Aguilar, adaptation from Data Structures class (COP 3530)
+ * @author E. Aguilar
  * @author A. Hernandez
  *         <p>
  *         This is a Binary Search Tree which is specialized for ordering geometric {@link LineSegment} objects, the
@@ -418,7 +418,7 @@ public class BinarySearchTree
 				return p.getLeftChild();
 			} else // If node has both children, copy inorder successor contents to it, and remove successor.
 			{
-				Node successor = findInorderSuccessorOf(p);
+				Node successor = p.getSuccessor();
 
 				// TODO finish deleting testing code.
 				// System.out.println("Test Successor: " + successor.getInfo());

@@ -1,5 +1,5 @@
 /**
- * @author E. Aguilar, adaptation from Data Structures class (COP 3530)
+ * @author E. Aguilar
  * @author A. Hernandez
  *         <p>
  *         This is a special Node object for a {@link BinarySearchTree} which is specialized for ordering
