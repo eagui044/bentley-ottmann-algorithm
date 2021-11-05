@@ -1,29 +1,26 @@
+import java.awt.Graphics;
+
 /**
  * @author E. Aguilar
  * @author S. Peca
  *         <p>
- *         A line segment is an ordered tuple of {@link Point} objects, p1 should be the first point, and p2 the last
- *         point. Implements the {@link Comparable} interface so that line segments can be compared based on whether
- *         they are above or below each other using the y-coordinates of their endpoints, typically p1.y is used for
- *         comparisons unless the reversedCompare flag is set, then p2.y is used.
+ *         A line segment is a 2-tuple of {@link Point} objects, p1 is the begin point, and p2 is the end point, no
+ *         guarantees in order. Line segments can be compared based on whether they are above or below each other using
+ *         the y-coordinates of the points contained within a line segment.
  *         </p>
  */
-public class LineSegment implements Comparable<LineSegment>
+public class LineSegment extends GeometricObject
 {
-	private Point p1; // The first endpoint.
-	private Point p2; // The second endpoint.
-	private boolean reversedCompare; // Normally p1 (first point) of segment is used for comparisons, but when this flag
-										// is set then p2 (second point) is used.
+	private Point p1; // The begin endpoint.
+	private Point p2; // The end endpoint.
 
-	public LineSegment(Point firstPoint, Point lastPoint)
+	public LineSegment(Point begin, Point end)
 	{
-		this.p1 = firstPoint;
-		this.p2 = lastPoint;
-		reversedCompare = false;
+		this.p1 = begin;
+		this.p2 = end;
 	}
 
-	// Finds the area of the triangle formed by three points using the shoelace
-	// method.
+	// Finds the area of the triangle formed by three points using the shoelace formula.
 	private double area(Point a, Point b, Point c)
 	{
 		return 0.5 * (a.getX() * (b.getY() - c.getY()) + b.getX() * (c.getY() - a.getY())
@@ -124,25 +121,80 @@ public class LineSegment implements Comparable<LineSegment>
 		}
 	}
 
-	@Override
-	public int compareTo(LineSegment other)
+	public int compareTo(LineSegment other, Point crossingPoint)
 	{
-		double thisY = reversedCompare ? p2.getY() : p1.getY();
-		double otherY = other.reversedCompare ? other.p2.getY() : other.p1.getY();
+		Point thisBegin, otherBegin, thisEnd, otherEnd;
 
-		if (Math.abs(thisY - otherY) < Globals.POINT_EPSILON)
+		if (p1.getX() <= p2.getX())
 		{
-			// TODO: May need to find better way to handle degenerate cases where the
-			// y-coordinates are equal.
-			return 0;
-		} else if (thisY > otherY)
-		{
-			return 1;
+			thisBegin = p1;
+			thisEnd = p2;
 		} else
 		{
-			return -1;
+			thisBegin = p2;
+			thisEnd = p1;
 		}
-
+		
+		if (other.p1.getX() <= other.p2.getX())
+		{
+			otherBegin = other.p1;
+			otherEnd = other.p2;
+		} else
+		{
+			otherBegin = other.p2;
+			otherEnd = other.p1;
+		}
+		
+		// Case where line segments are the same, i.e., line segment has been found.
+		if (thisBegin.equals(otherBegin) && thisEnd.equals(otherEnd))
+		{
+			return 0;
+		}
+		// Case where line segments share an exact endpoint.
+		else if (thisBegin.equals(otherBegin))
+		{
+			if (thisEnd.getY() >= otherEnd.getY())
+			{
+				return 1;
+			} else
+			{
+				return -1;
+			}
+		}
+		// General case where line segments are compared at their crossing points with the sweep line.
+		else
+		{
+			double x, y, x0, y0; // points
+			double v1, v2; // vector components in the directions of the x and y axes respectively.
+			
+			x = crossingPoint.getX();
+			v1 = otherEnd.getX() - otherBegin.getX();
+			v2 = otherEnd.getY() - otherBegin.getY();
+			x0 = otherBegin.getX();
+			y0 = otherBegin.getY();
+			
+			// Using parametric equation for lines, to obtain interior crossing points.
+			double t = (x - x0) / v1;
+			y = y0 + v2*t;
+			
+			if (Math.abs(crossingPoint.getY() - y) < Globals.POINT_EPSILON)
+			{
+				if (thisEnd.getY() >= otherEnd.getY())
+				{
+					return 1;
+				} else
+				{
+					return -1;
+				}
+			}
+			else if (crossingPoint.getY() > y)
+			{
+				return 1;
+			} else
+			{
+				return -1;
+			}
+		}
 	}
 
 	// Returns only the k-component of the cross product, not the entire orthogonal
@@ -177,9 +229,9 @@ public class LineSegment implements Comparable<LineSegment>
 		 * endpoint of the rightmost line segment, then the segments do not intersect) 2. The two line segments are not
 		 * collinear. In this case, we need to check that both line segments straddle each other (i.e. the directions
 		 * from one line segment to the two endpoints of the other line segment are opposites). NOTE: If the line
-		 * segments intersect at exactly one point, then this means that they are adjacent to each other in the polygon,
-		 * and so for the purposes of this method, we will consider them not intersecting. In the case where two line
-		 * segments share an endpoint,
+		 * segments intersect at exactly one endpoint, then this means that they are adjacent to each other in the
+		 * polygon, and so for the purposes of this method, we will consider them not intersecting. In the case where
+		 * two line segments share an endpoint.
 		 */
 
 		// First we check if the line segments share an endpoint.
@@ -233,16 +285,6 @@ public class LineSegment implements Comparable<LineSegment>
 				&& Math.abs(area(this.p1, this.p2, other.p2)) < Globals.POINT_EPSILON;
 	}
 
-	public boolean isReversedCompare()
-	{
-		return reversedCompare;
-	}
-
-	public void setReversedCompare(boolean reversedCompare)
-	{
-		this.reversedCompare = reversedCompare;
-	}
-
 	// Checks if an line segment straddles another (i.e. the directions from one
 	// line segment to the two endpoints of the other line segment are opposites).
 	private boolean straddles(LineSegment other)
@@ -272,5 +314,54 @@ public class LineSegment implements Comparable<LineSegment>
 	public String toString()
 	{
 		return "LineSegment: {" + p1 + ", " + p2 + "}";
+	}
+
+	public double length()
+	{
+		return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
+	}
+
+	public boolean isHorizontal()
+	{
+		return Math.abs(p1.getY() - p2.getY()) < Globals.POINT_EPSILON ? true : false;
+	}
+
+	public boolean isVertical()
+	{
+		return Math.abs(p1.getX() - p2.getX()) < Globals.POINT_EPSILON ? true : false;
+	}
+	
+	public Point getLeftEndpoint()
+	{
+		if (!isVertical())
+		{
+			return (p1.getX() < p2.getX()) ? p1 : p2;
+		} else
+		{
+			return (p1.getY() > p2.getY()) ? p1 : p2;
+		}
+	}
+	
+	public Point getRightEndpoint()
+	{
+		if (!isVertical())
+		{
+			return (p1.getX() > p2.getX()) ? p1 : p2;
+		} else
+		{
+			return (p1.getY() < p2.getY()) ? p1 : p2;
+		}
+	}
+
+	@Override
+	public void draw(Graphics g)
+	{
+		// line segment is drawn by using its boundary, not its interior
+		// (width of line=0)
+		
+		g.setColor(getBoundaryColor());
+		g.drawLine((int)p1.getX(), (int)p1.getY(), (int)p2.getX(), (int)p2.getY());
+		p1.draw(g);
+		p2.draw(g);
 	}
 }

@@ -1,7 +1,9 @@
+import java.awt.Graphics;
+
 /**
  * @author E. Aguilar
  */
-public class Point
+public class Point extends GeometricObject
 {
 	private double x;
 	private double y;
@@ -73,5 +75,16 @@ public class Point
 	public String toString()
 	{
 		return "Point: (" + x + ", " + y + ")";
+	}
+
+	@Override
+	public void draw(Graphics g)
+	{
+		int radius = 2;
+        
+        g.setColor(getInteriorColor());
+        g.fillOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
+        g.setColor(getBoundaryColor());
+        g.drawOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
 	}
 }
