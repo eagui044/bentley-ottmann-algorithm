@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 
 public class FrameDisplay extends JFrame
@@ -15,9 +15,9 @@ public class FrameDisplay extends JFrame
      * 
      * @param width frame width
      * @param height frame height
-     * @param g geometric objects to be depicted in this frame
+     * @param geometryList geometric objects to be depicted in this frame
      */
-    public FrameDisplay(int width, int height, ArrayList<GeometricObject> geometryList)
+    public FrameDisplay(int width, int height, List<GeometricObject> geometryList)
     {
         setTitle("Set of Line Segments");
         setSize(width, height);
@@ -29,7 +29,7 @@ public class FrameDisplay extends JFrame
                 //are at or above their preferred sizes
     }
     
-    public void setGeometryList(ArrayList<GeometricObject> geometryList)
+    public void setGeometryList(List<GeometricObject> geometryList)
     {
     	panel.setGeometryList(geometryList);
     }

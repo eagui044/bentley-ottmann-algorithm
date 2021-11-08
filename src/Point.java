@@ -80,7 +80,7 @@ public class Point extends GeometricObject
 	@Override
 	public void draw(Graphics g)
 	{
-		int radius = 2;
+		int radius = 3;
         
         g.setColor(getInteriorColor());
         g.fillOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);

@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.List;
 
 public class GraphDisplay extends JPanel
 {
@@ -9,12 +9,12 @@ public class GraphDisplay extends JPanel
 	 */
 	private static final long serialVersionUID = 1802022021377994284L;
 
-	ArrayList<GeometricObject> geometryList; // geometric objects
+	private List<GeometricObject> geometryList; // geometric objects
 
 	/**
 	 * Parameterized constructor.
 	 */
-	public GraphDisplay(int width, int height, ArrayList<GeometricObject> geometryList)
+	public GraphDisplay(int width, int height, List<GeometricObject> geometryList)
 	{
 		this.geometryList = geometryList;
 
@@ -32,14 +32,14 @@ public class GraphDisplay extends JPanel
 		super.paint(g); // clears window
 
 		// draws geometric objects
-		for (GeometricObject e : geometryList)
+		for (int i = 0; i < geometryList.size(); i++)
 		{
-			e.draw(g); // invokes object's draw method through polymorphism
+			geometryList.get(i).draw(g); // invokes object's draw method through polymorphism
 		}
 
 	}
 
-	public void setGeometryList(ArrayList<GeometricObject> geometryList)
+	public void setGeometryList(List<GeometricObject> geometryList)
 	{
 		this.geometryList = geometryList;
 	}

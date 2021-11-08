@@ -3,18 +3,30 @@ public class Event
 {
 	public enum Type
 	{
-		LEFT, RIGHT
+		LEFT, RIGHT, INTERSECTION
 	}
+
 	private Point eventPoint;
 	private LineSegment segment;
+	private LineSegment intersectionSegment; // Typically null unless Event is of type intersection.
 
 	private Type eventType;
+
+	public Event(Point eventPoint, LineSegment segment, LineSegment intersectionSegment, Type eventType)
+	{
+		this.eventPoint = eventPoint;
+		this.segment = segment;
+		this.intersectionSegment = intersectionSegment;
+		this.eventType = eventType;
+	}
 
 	public Event(Point eventPoint, LineSegment segment, Type eventType)
 	{
 		this.eventPoint = eventPoint;
 		this.segment = segment;
-		this.setEventType(eventType);
+		this.eventType = eventType;
+
+		this.intersectionSegment = null;
 	}
 
 	public Point getEventPoint()
@@ -25,6 +37,11 @@ public class Event
 	public Type getEventType()
 	{
 		return eventType;
+	}
+
+	public LineSegment getIntersectionSegment()
+	{
+		return intersectionSegment;
 	}
 
 	public LineSegment getSegment()
@@ -42,6 +59,11 @@ public class Event
 		this.eventType = eventType;
 	}
 
+	public void setIntersectionSegment(LineSegment intersectionSegment)
+	{
+		this.intersectionSegment = intersectionSegment;
+	}
+
 	public void setSegment(LineSegment segment)
 	{
 		this.segment = segment;
@@ -50,6 +72,7 @@ public class Event
 	@Override
 	public String toString()
 	{
-		return String.format("Event: eventPoint: %s, segment: %s, type: %s", eventPoint, segment, eventType);
+		return String.format("Event: eventPoint: %s, segment: %s, intersectionSegment: %s, eventType: %s", eventPoint,
+				segment, intersectionSegment, eventType);
 	}
 }

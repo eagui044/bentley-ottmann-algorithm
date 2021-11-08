@@ -22,11 +22,6 @@ public class Node
 		predecessor = successor = null;
 	}
 
-	public LineSegment getInfo()
-	{
-		return segment;
-	}
-
 	public Node getLeftChild()
 	{
 		return left;
@@ -47,14 +42,14 @@ public class Node
 		return right;
 	}
 
+	public LineSegment getSegment()
+	{
+		return segment;
+	}
+
 	public Node getSuccessor()
 	{
 		return successor;
-	}
-
-	public void setInfo(LineSegment segment)
-	{
-		this.segment = segment;
 	}
 
 	public void setLeftChild(Node left)
@@ -85,6 +80,11 @@ public class Node
 	public void setRightChild(Node right)
 	{
 		this.right = right;
+	}
+
+	public void setSegment(LineSegment segment)
+	{
+		this.segment = segment;
 	}
 
 	public void setSuccessor(Node successor)

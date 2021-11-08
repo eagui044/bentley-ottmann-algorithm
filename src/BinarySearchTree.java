@@ -1,3 +1,4 @@
+
 /**
  * @author E. Aguilar
  * @author A. Hernandez
@@ -17,25 +18,27 @@ public class BinarySearchTree
 		root = new Node(); // Dummy node as the root
 		root.setLeftChild(null);
 		root.setRightChild(null);
-		root.setInfo(null);
+		root.setSegment(null);
 	}
 
-	public void add(LineSegment s, Point crossingPoint)
+	public Node add(LineSegment s, Point eventPoint)
 	{
 		if (root.getLeftChild() == null)
 		{
 			Node first = new Node();
 			first.setNode(s, null, null, null, null, null);
 			root.setLeftChild(first);
+			
+			return first;
 		} else
 		{
-			insert(s, crossingPoint, root.getLeftChild());
+			return insert(s, eventPoint, root.getLeftChild());
 		}
 	}
 
-	public boolean contains(LineSegment s, Point crossingPoint)
+	public boolean contains(LineSegment s, Point eventPoint)
 	{
-		return search(s, crossingPoint, root.getLeftChild());
+		return search(s, eventPoint, root.getLeftChild());
 	}
 
 	public void display()
@@ -120,25 +123,25 @@ public class BinarySearchTree
 		return current;
 	}
 
-	public Node findNode(LineSegment s, Point crossingPoint)
+	public Node findNode(LineSegment s, Point eventPoint)
 	{
-		return findNode(s, crossingPoint, root.getLeftChild());
+		return findNode(s, eventPoint, root.getLeftChild());
 	}
 
-	private Node findNode(LineSegment s, Point crossingPoint, Node p)
-	{
+	private Node findNode(LineSegment s, Point eventPoint, Node p)
+	{	
 		if (p == null)
 		{
 			return null;
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == 0)
+		} else if (s.compareTo(p.getSegment(), eventPoint) == 0)
 		{
 			return p;
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == -1)
-		{
-			return findNode(s, crossingPoint, p.getLeftChild());
+		} else if (s.compareTo(p.getSegment(), eventPoint) == -1)
+		{		
+			return findNode(s, eventPoint, p.getLeftChild());
 		} else
 		{
-			return findNode(s, crossingPoint, p.getRightChild());
+			return findNode(s, eventPoint, p.getRightChild());
 		}
 	}
 
@@ -158,24 +161,24 @@ public class BinarySearchTree
 		}
 	}
 
-	public int getCountOf(LineSegment s, Point crossingPoint)
+	public int getCountOf(LineSegment s, Point eventPoint)
 	{
-		return getCountOf(s, crossingPoint, root.getLeftChild());
+		return getCountOf(s, eventPoint, root.getLeftChild());
 	}
 
-	private int getCountOf(LineSegment s, Point crossingPoint, Node p)
+	private int getCountOf(LineSegment s, Point eventPoint, Node p)
 	{
 		if (p != null)
 		{
-			if (s.compareTo(p.getInfo(), crossingPoint) == 0)
+			if (s.compareTo(p.getSegment(), eventPoint) == 0)
 			{
-				return 1 + getCountOf(s, crossingPoint, p.getRightChild());
-			} else if (s.compareTo(p.getInfo(), crossingPoint) == -1)
+				return 1 + getCountOf(s, eventPoint, p.getRightChild());
+			} else if (s.compareTo(p.getSegment(), eventPoint) == -1)
 			{
-				return getCountOf(s, crossingPoint, p.getLeftChild());
+				return getCountOf(s, eventPoint, p.getLeftChild());
 			} else
 			{
-				return getCountOf(s, crossingPoint, p.getRightChild());
+				return getCountOf(s, eventPoint, p.getRightChild());
 			}
 		} else
 		{
@@ -208,7 +211,7 @@ public class BinarySearchTree
 	{
 		if (p.getRightChild() == null)
 		{
-			return p.getInfo();
+			return p.getSegment();
 		} else
 		{
 			return getMax(p.getRightChild());
@@ -229,7 +232,7 @@ public class BinarySearchTree
 	{
 		if (p.getLeftChild() == null)
 		{
-			return p.getInfo();
+			return p.getSegment();
 		} else
 		{
 			return getMin(p.getLeftChild());
@@ -246,7 +249,7 @@ public class BinarySearchTree
 		if (p != null)
 		{
 			inorderDisplay(p.getLeftChild());
-			System.out.print(p.getInfo() + " ");
+			System.out.print(p.getSegment() + " ");
 			inorderDisplay(p.getRightChild());
 		}
 	}
@@ -261,7 +264,7 @@ public class BinarySearchTree
 
 				while (current != null)
 				{
-					System.out.println(current.getInfo());
+					System.out.println(current.getSegment());
 					current = current.getSuccessor();
 				}
 			} else
@@ -270,16 +273,16 @@ public class BinarySearchTree
 
 				while (current != null)
 				{
-					System.out.println(current.getInfo());
+					System.out.println(current.getSegment());
 					current = current.getPredecessor();
 				}
 			}
 		}
 	}
 
-	private void insert(LineSegment s, Point crossingPoint, Node p)
+	private Node insert(LineSegment s, Point eventPoint, Node p)
 	{
-		if (s.compareTo(p.getInfo(), crossingPoint) == -1) // If < current node, insert left.
+		if (s.compareTo(p.getSegment(), eventPoint) == -1) // If < current node, insert left.
 		{
 			if (p.getLeftChild() == null)
 			{
@@ -299,9 +302,11 @@ public class BinarySearchTree
 				{
 					newChild.getSuccessor().setPredecessor(newChild);
 				}
+				
+				return newChild;
 			} else
 			{
-				insert(s, crossingPoint, p.getLeftChild());
+				return insert(s, eventPoint, p.getLeftChild());
 			}
 		} else // if >= current node, insert right.
 		{
@@ -323,9 +328,11 @@ public class BinarySearchTree
 				{
 					newChild.getSuccessor().setPredecessor(newChild);
 				}
+				
+				return newChild;
 			} else
 			{
-				insert(s, crossingPoint, p.getRightChild());
+				return insert(s, eventPoint, p.getRightChild());
 			}
 		}
 	}
@@ -341,7 +348,7 @@ public class BinarySearchTree
 		{
 			postorderDisplay(p.getLeftChild());
 			postorderDisplay(p.getRightChild());
-			System.out.print(p.getInfo() + " ");
+			System.out.print(p.getSegment() + " ");
 		}
 	}
 
@@ -349,15 +356,16 @@ public class BinarySearchTree
 	{
 		if (p != null)
 		{
-			System.out.print(p.getInfo() + " ");
+			System.out.print(p.getSegment() + " ");
 			preorderDisplay(p.getLeftChild());
 			preorderDisplay(p.getRightChild());
 		}
 	}
 
-	public void remove(LineSegment s, Point crossingPoint)
+	public void remove(LineSegment s, Point eventPoint)
 	{
-		Node p = findNode(s, s.getRightEndpoint(), root.getLeftChild());
+		//TODO Using findNode function might be redundant and unnecessary, test code without it.
+		Node p = findNode(s, eventPoint, root.getLeftChild());
 
 		if (p != null)
 		{
@@ -372,7 +380,7 @@ public class BinarySearchTree
 				p.getSuccessor().setPredecessor(p.getPredecessor());
 			}
 
-			root.setLeftChild(remove(s, crossingPoint, root.getLeftChild()));
+			root.setLeftChild(remove(s, eventPoint, root.getLeftChild()));
 
 			if (root.getLeftChild() != null)
 			{
@@ -381,23 +389,23 @@ public class BinarySearchTree
 		}
 	}
 
-	private Node remove(LineSegment s, Point crossingPoint, Node p)
-	{
+	private Node remove(LineSegment s, Point eventPoint, Node p)
+	{		
 		// If tree is empty.
 		if (p == null)
 		{
 			return p;
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == -1)
+		} else if (s.compareTo(p.getSegment(), eventPoint) == -1)
 		{
-			p.setLeftChild(remove(s, crossingPoint, p.getLeftChild()));
+			p.setLeftChild(remove(s, eventPoint, p.getLeftChild()));
 
 			if (p.getLeftChild() != null)
 			{
 				p.getLeftChild().setParent(p);
 			}
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == 1)
+		} else if (s.compareTo(p.getSegment(), eventPoint) == 1)
 		{
-			p.setRightChild(remove(s, crossingPoint, p.getRightChild()));
+			p.setRightChild(remove(s, eventPoint, p.getRightChild()));
 
 			if (p.getRightChild() != null)
 			{
@@ -405,7 +413,9 @@ public class BinarySearchTree
 			}
 		} else
 		{ // If matching LineSegment is found.
-
+			// TODO delete after testing.
+			System.out.println("Found LineSegment: " + s);
+			
 			// Node with no child.
 			if (p.getLeftChild() == null && p.getRightChild() == null)
 			{
@@ -418,10 +428,10 @@ public class BinarySearchTree
 				return p.getLeftChild();
 			} else // If node has both children, copy inorder successor contents to it, and remove successor.
 			{
-				Node successor = p.getSuccessor();
+				Node successor = findInorderSuccessorOf(p);
 
 				// Copy contents of successor to node.
-				p.setInfo(successor.getInfo());
+				p.setSegment(successor.getSegment());
 				p.setPredecessor(successor.getPredecessor());
 				p.setSuccessor(successor.getSuccessor());
 
@@ -434,9 +444,9 @@ public class BinarySearchTree
 				{
 					p.getSuccessor().setPredecessor(p);
 				}
-
+				
 				// Remove the inorder successor.
-				p.setRightChild(remove(p.getInfo(), crossingPoint, p.getRightChild()));
+				p.setRightChild(remove(successor.getSegment(), eventPoint, p.getRightChild()));
 
 				if (p.getRightChild() != null)
 				{
@@ -448,20 +458,20 @@ public class BinarySearchTree
 		return p;
 	}
 
-	private boolean search(LineSegment s, Point crossingPoint, Node p)
+	private boolean search(LineSegment s, Point eventPoint, Node p)
 	{
 		if (p == null)
 		{
 			return false;
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == 0)
+		} else if (s.compareTo(p.getSegment(), eventPoint) == 0)
 		{
 			return true;
-		} else if (s.compareTo(p.getInfo(), crossingPoint) == -1)
+		} else if (s.compareTo(p.getSegment(), eventPoint) == -1)
 		{
-			return search(s, crossingPoint, p.getLeftChild());
+			return search(s, eventPoint, p.getLeftChild());
 		} else
 		{
-			return search(s, crossingPoint, p.getRightChild());
+			return search(s, eventPoint, p.getRightChild());
 		}
 	}
 
@@ -474,10 +484,21 @@ public class BinarySearchTree
 	{
 		if (p != null)
 		{
-			return toString(p.getLeftChild()) + p.getInfo() + "\n" + toString(p.getRightChild());
+			return toString(p.getLeftChild()) + p.getSegment() + "\n" + toString(p.getRightChild());
 		} else
 		{
 			return "";
 		}
+	}
+	
+	public void swapNodeInfo(Node p, Node q)
+	{
+		LineSegment temp = p.getSegment();
+		
+		// Swapping p with q.
+		p.setSegment(q.getSegment());
+		
+		// Swapping q with p.
+		q.setSegment(temp);
 	}
 }

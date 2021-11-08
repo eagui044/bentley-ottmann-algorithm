@@ -20,27 +20,49 @@ public class EventQueue
 
 		double minX = events[minimum].getEventPoint().getX();
 
-		if (left < size)
+		if (left <= size)
 		{
 			double leftX = events[left].getEventPoint().getX();
 
-			// If leftX is less than minX then the left event point is smaller.
-			if (leftX < minX)
+			// If the two event points have the same x, then the minimum will be the point with the minimum y.
+			if (Math.abs(leftX - minX) < Globals.POINT_EPSILON)
+			{
+				double minY = events[minimum].getEventPoint().getY();
+				double leftY = events[left].getEventPoint().getY();
+
+				if (leftY < minY)
+				{
+					minimum = left;
+				}
+			}
+			// Else if leftX is less than minX then the left event point is smaller.
+			else if (leftX < minX)
 			{
 				minimum = left;
-				minX = events[minimum].getEventPoint().getX();
+				minX = leftX;
 			}
 		}
 
-		if (right < size)
+		if (right <= size)
 		{
 			double rightX = events[right].getEventPoint().getX();
 
+			// If the two event points have the same x, then the minimum will be the point with the minimum y.
+			if (Math.abs(rightX - minX) < Globals.POINT_EPSILON)
+			{
+				double minY = events[minimum].getEventPoint().getY();
+				double rightY = events[right].getEventPoint().getY();
+
+				if (rightY < minY)
+				{
+					minimum = right;
+				}
+			}
 			// If rightX is less than minX then the right event point is smaller.
-			if (rightX < minX)
+			else if (rightX < minX)
 			{
 				minimum = right;
-				minX = events[minimum].getEventPoint().getX();
+				minX = rightX;
 			}
 		}
 
@@ -69,7 +91,7 @@ public class EventQueue
 		events[y] = swap;
 	}
 
-	Event[] events;
+	private Event[] events;
 
 	private int arraySize; // size of the array
 	private int length; // current number of elements in the array
@@ -79,14 +101,13 @@ public class EventQueue
 		this.events = new Event[events.length + 1];
 		System.arraycopy(events, 0, this.events, 1, events.length);
 		length = events.length;
-		arraySize = length + 1;
+		arraySize = events.length + 1;
 
 		// Build heap (rearranges array)
 		// i starts at last non-leaf node, heapfiying by sift-down technique.
-		int n = length;
-		for (int i = n / 2; i > 0; i--)
+		for (int i = length / 2; i > 0; i--)
 		{
-			heapify(this.events, n, i);
+			heapify(this.events, length, i);
 		}
 	}
 
@@ -103,13 +124,53 @@ public class EventQueue
 		int loc = ++length;
 
 		events[0] = e;
-		while (e.getEventPoint().getX() < events[loc / 2].getEventPoint().getX())
+		double eventX = e.getEventPoint().getX();
+		while (eventX < events[loc / 2].getEventPoint().getX())
+		{
+			events[loc] = events[loc / 2];
+			loc /= 2;
+		}
+
+		// If the two event points have the same x, then bubble up the point with the minimum y.
+		double eventY = e.getEventPoint().getY();
+		while (Math.abs(eventX - events[loc / 2].getEventPoint().getX()) < Globals.POINT_EPSILON
+				&& eventY < events[loc / 2].getEventPoint().getY())
 		{
 			events[loc] = events[loc / 2];
 			loc /= 2;
 		}
 
 		events[loc] = e;
+	}
+
+	public void deleteEventPoint(Point eventPoint)
+	{	
+		events[0] = null;
+		for (int i = 1; i <= length; i++)
+		{
+			if (events[i].getEventPoint().equals(eventPoint))
+			{
+				for (int j = i; j <= length - 1; j++)
+				{
+					events[j] = events[j + 1];
+				}
+				for (int j = length; j < arraySize; j++)
+				{
+					events[j]= null;
+				}
+				
+				length--;
+
+				// Rebuild heap (rearranges array)
+				// i starts at last non-leaf node, heapfiying by sift-down technique.
+				for (int j = length / 2; j > 0; j--)
+				{
+					heapify(events, length, j);
+				}
+				
+				break;
+			}
+		}
 	}
 
 	public boolean isEmpty()
@@ -133,12 +194,23 @@ public class EventQueue
 		{
 			int child = parent * 2;
 
-			if (child != length && events[child + 1].getEventPoint().getX() < events[child].getEventPoint().getX())
+			double rightChildX = events[child + 1].getEventPoint().getX();
+			double leftChildX = events[child].getEventPoint().getX();
+			double rightChildY = events[child + 1].getEventPoint().getY();
+			double leftChildY = events[child].getEventPoint().getY();
+
+			if (child != length && (rightChildX < leftChildX
+					|| (Math.abs(rightChildX - leftChildX) < Globals.POINT_EPSILON && rightChildY < leftChildY)))
 			{
 				child++;
 			}
 
-			if (events[child].getEventPoint().getX() < lastEvent.getEventPoint().getX())
+			double childX = events[child].getEventPoint().getX();
+			double childY = events[child].getEventPoint().getY();
+
+			if (childX < lastEvent.getEventPoint().getX()
+					|| (Math.abs(childX - lastEvent.getEventPoint().getX()) < Globals.POINT_EPSILON
+							&& childY < lastEvent.getEventPoint().getY()))
 			{
 				events[parent] = events[child];
 			} else

@@ -121,39 +121,24 @@ public class LineSegment extends GeometricObject
 		}
 	}
 
-	public int compareTo(LineSegment other, Point crossingPoint)
+	public int compareTo(LineSegment other, Point eventPoint)
 	{
-		Point thisBegin, otherBegin, thisEnd, otherEnd;
+		Point thisLeft = this.getLeftEndpoint();
+		Point thisRight = this.getRightEndpoint();
+		Point otherLeft = other.getLeftEndpoint();
+		Point otherRight = other.getRightEndpoint();
 
-		if (p1.getX() <= p2.getX())
-		{
-			thisBegin = p1;
-			thisEnd = p2;
-		} else
-		{
-			thisBegin = p2;
-			thisEnd = p1;
-		}
-		
-		if (other.p1.getX() <= other.p2.getX())
-		{
-			otherBegin = other.p1;
-			otherEnd = other.p2;
-		} else
-		{
-			otherBegin = other.p2;
-			otherEnd = other.p1;
-		}
-		
 		// Case where line segments are the same, i.e., line segment has been found.
-		if (thisBegin.equals(otherBegin) && thisEnd.equals(otherEnd))
+		if (thisLeft.equals(otherLeft) && thisRight.equals(otherRight))
 		{
 			return 0;
 		}
 		// Case where line segments share an exact endpoint.
-		else if (thisBegin.equals(otherBegin))
+		else if (thisLeft.equals(otherLeft))
 		{
-			if (thisEnd.getY() >= otherEnd.getY())
+			double orientation = crossProductK(thisLeft, thisRight, otherLeft, otherRight);
+
+			if (orientation <= 0.0)
 			{
 				return 1;
 			} else
@@ -161,38 +146,91 @@ public class LineSegment extends GeometricObject
 				return -1;
 			}
 		}
-		// General case where line segments are compared at their crossing points with the sweep line.
+		// General case where line segments are compared at their event points with the sweep line.
 		else
 		{
 			double x, y, x0, y0; // points
 			double v1, v2; // vector components in the directions of the x and y axes respectively.
-			
-			x = crossingPoint.getX();
-			v1 = otherEnd.getX() - otherBegin.getX();
-			v2 = otherEnd.getY() - otherBegin.getY();
-			x0 = otherBegin.getX();
-			y0 = otherBegin.getY();
-			
-			// Using parametric equation for lines, to obtain interior crossing points.
-			double t = (x - x0) / v1;
-			y = y0 + v2*t;
-			
-			if (Math.abs(crossingPoint.getY() - y) < Globals.POINT_EPSILON)
+
+			// This assumes that both line segments cannot be vertical, i.e., two vertical line segments should not be
+			// intersecting when found by the sweep line.
+			if (!other.isVertical())
 			{
-				if (thisEnd.getY() >= otherEnd.getY())
+				x = eventPoint.getX();
+				v1 = otherRight.getX() - otherLeft.getX();
+				v2 = otherRight.getY() - otherLeft.getY();
+				x0 = otherLeft.getX();
+				y0 = otherLeft.getY();
+			} else
+			{
+				x = otherLeft.getX();
+				v1 = thisRight.getX() - thisLeft.getX();
+				v2 = thisRight.getY() - thisLeft.getY();
+				x0 = thisLeft.getX();
+				y0 = thisLeft.getY();
+			}
+
+			// Using parametric equation for lines, to obtain interior points (i.e., non-endpoints).
+			double t = (x - x0) / v1;
+			y = y0 + v2 * t;
+
+			if (t < 0.0 || t > 1.0)
+			{
+				System.err.println("Warning: Event point that is out of other line segment range "
+						+ "is being used for comparisons, algorithm may not perform correctly.");
+			}
+
+			if (!other.isVertical())
+			{
+				if (Math.abs(eventPoint.getY() - y) < Globals.POINT_EPSILON)
+				{
+					Point crossingPoint = this.getIntersectionPointWith(other);
+					double orientation = crossProductK(crossingPoint, thisRight, crossingPoint, otherRight);
+
+					if (crossingPoint != null && crossingPoint.equals(eventPoint))
+					{
+						if (orientation <= 0.0)
+						{
+							return -1;
+						} else
+						{
+							return 1;
+						}
+					} else
+					{
+						if (orientation <= 0.0)
+						{
+							return 1;
+						} else
+						{
+							return -1;
+						}
+					}
+				} else if (eventPoint.getY() > y)
 				{
 					return 1;
 				} else
 				{
 					return -1;
 				}
-			}
-			else if (crossingPoint.getY() > y)
-			{
-				return 1;
 			} else
 			{
-				return -1;
+				if (Math.abs(otherLeft.getY() - y) < Globals.POINT_EPSILON)
+				{
+					if (thisRight.getY() >= otherRight.getY())
+					{
+						return 1;
+					} else
+					{
+						return -1;
+					}
+				} else if (otherLeft.getY() > y)
+				{
+					return -1;
+				} else
+				{
+					return 1;
+				}
 			}
 		}
 	}
@@ -202,10 +240,85 @@ public class LineSegment extends GeometricObject
 	// In 2D space when extending the cross product to 3D space, the i and j
 	// components are zero, and only the k-component is non-zero, making it useful
 	// for determining clockwise or counterclockwise orientation.
+	// For v1 x v2, if v1 is above v2 (counterclockwise) then the k-component is negative,
+	// if v1 is below v2 (clockwise) then the k-component is positive, else it is 0.0 if v1 and v2 are parallel.
 	private double crossProductK(Point v1p1, Point v1p2, Point v2p1, Point v2p2)
 	{
 		return (v1p2.getX() - v1p1.getX()) * (v2p2.getY() - v2p1.getY())
 				- (v1p2.getY() - v1p1.getY()) * (v2p2.getX() - v2p1.getX());
+	}
+
+	@Override
+	public void draw(Graphics g)
+	{
+		// line segment is drawn by using its boundary, not its interior
+		// (width of line=0)
+
+		g.setColor(getBoundaryColor());
+		g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY());
+		p1.draw(g);
+		p2.draw(g);
+	}
+
+	/**
+	 * Calculates the point of intersection between this and another line segment, but will return null if the line
+	 * segments do not intersect or are collinear. Note that line segments that share just an endpoint are not
+	 * considered intersecting.
+	 * 
+	 * @param other The other line segment
+	 * @return The point where this and the other line segment intersect.
+	 */
+	public Point getIntersectionPointWith(LineSegment other)
+	{
+		if (this.isCollinearTo(other) || !this.intersects(other))
+		{
+			return null;
+		} else
+		{
+			double x1 = p1.getX();
+			double y1 = p1.getY();
+			double x2 = other.p1.getX();
+			double y2 = other.p1.getY();
+			double m1, m2, b1, b2, x, y;
+
+			if (!this.isVertical() && !other.isVertical())
+			{
+				m1 = (p2.getY() - p1.getY()) / (p2.getX() - p1.getX());
+				m2 = (other.p2.getY() - other.p1.getY()) / (other.p2.getX() - other.p1.getX());
+				b1 = y1 - m1 * x1;
+				b2 = y2 - m2 * x2;
+
+				x = (b2 - b1) / (m1 - m2);
+				y = m1 * x + b1;
+			} else if (this.isVertical())
+			{
+				m2 = (other.p2.getY() - other.p1.getY()) / (other.p2.getX() - other.p1.getX());
+				b2 = y2 - m2 * x2;
+
+				x = x1;
+				y = m2 * x + b2;
+			} else
+			{
+				m1 = (p2.getY() - p1.getY()) / (p2.getX() - p1.getX());
+				b1 = y1 - m1 * x1;
+
+				x = x2;
+				y = m1 * x + b1;
+			}
+
+			return new Point(x, y);
+		}
+	}
+
+	public Point getLeftEndpoint()
+	{
+		if (!isVertical())
+		{
+			return (p1.getX() < p2.getX()) ? p1 : p2;
+		} else
+		{
+			return (p1.getY() < p2.getY()) ? p1 : p2;
+		}
 	}
 
 	public Point getP1()
@@ -216,6 +329,17 @@ public class LineSegment extends GeometricObject
 	public Point getP2()
 	{
 		return p2;
+	}
+
+	public Point getRightEndpoint()
+	{
+		if (!isVertical())
+		{
+			return (p1.getX() > p2.getX()) ? p1 : p2;
+		} else
+		{
+			return (p1.getY() > p2.getY()) ? p1 : p2;
+		}
 	}
 
 	/*
@@ -254,8 +378,7 @@ public class LineSegment extends GeometricObject
 		}
 
 		// The line segments do not share an endpoint. They are parallel if their cross
-		// product
-		// is zero
+		// product is zero
 		if (this.isCollinearTo(other))
 		{
 			return collinearIntersects(other);
@@ -283,6 +406,21 @@ public class LineSegment extends GeometricObject
 
 		return Math.abs(area(this.p1, this.p2, other.p1)) < Globals.POINT_EPSILON
 				&& Math.abs(area(this.p1, this.p2, other.p2)) < Globals.POINT_EPSILON;
+	}
+
+	public boolean isHorizontal()
+	{
+		return Math.abs(p1.getY() - p2.getY()) < Globals.POINT_EPSILON ? true : false;
+	}
+
+	public boolean isVertical()
+	{
+		return Math.abs(p1.getX() - p2.getX()) < Globals.POINT_EPSILON ? true : false;
+	}
+
+	public double length()
+	{
+		return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
 	}
 
 	// Checks if an line segment straddles another (i.e. the directions from one
@@ -314,54 +452,5 @@ public class LineSegment extends GeometricObject
 	public String toString()
 	{
 		return "LineSegment: {" + p1 + ", " + p2 + "}";
-	}
-
-	public double length()
-	{
-		return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
-	}
-
-	public boolean isHorizontal()
-	{
-		return Math.abs(p1.getY() - p2.getY()) < Globals.POINT_EPSILON ? true : false;
-	}
-
-	public boolean isVertical()
-	{
-		return Math.abs(p1.getX() - p2.getX()) < Globals.POINT_EPSILON ? true : false;
-	}
-	
-	public Point getLeftEndpoint()
-	{
-		if (!isVertical())
-		{
-			return (p1.getX() < p2.getX()) ? p1 : p2;
-		} else
-		{
-			return (p1.getY() > p2.getY()) ? p1 : p2;
-		}
-	}
-	
-	public Point getRightEndpoint()
-	{
-		if (!isVertical())
-		{
-			return (p1.getX() > p2.getX()) ? p1 : p2;
-		} else
-		{
-			return (p1.getY() < p2.getY()) ? p1 : p2;
-		}
-	}
-
-	@Override
-	public void draw(Graphics g)
-	{
-		// line segment is drawn by using its boundary, not its interior
-		// (width of line=0)
-		
-		g.setColor(getBoundaryColor());
-		g.drawLine((int)p1.getX(), (int)p1.getY(), (int)p2.getX(), (int)p2.getY());
-		p1.draw(g);
-		p2.draw(g);
 	}
 }

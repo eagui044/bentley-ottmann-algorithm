@@ -1,10 +1,14 @@
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JFrame;
-import java.awt.*;
+import java.awt.Color;
 
 public class Tester
 {
+	//TODO when done testing remove public static variables.
+	public static FrameDisplay frame;
+	public static ArrayList<GeometricObject> geometryList;
+	
 	public static void main(String[] args)
 	{
 		new Tester();
@@ -16,13 +20,11 @@ public class Tester
 		int frameWidth = 900;
 		int frameHeight = 900;
 		
-		BinarySearchTree bst = new BinarySearchTree();
 		Random rand = new Random();
-		int segmentCount = 5;
+		int segmentCount = 100;
 		int coordinateRange = 900;
 
-		ArrayList<GeometricObject> geometryList = new ArrayList<>(segmentCount);
-		Event[] events = new Event[segmentCount*2];
+		geometryList = new ArrayList<>(segmentCount);
 
 		// Generate random line segments to insert into tree.
 		for (int i = 0; i < segmentCount*2; i += 2)
@@ -31,81 +33,34 @@ public class Tester
 			double y1 = coordinateRange * rand.nextDouble();
 			double x2 = coordinateRange * rand.nextDouble();
 			double y2 = coordinateRange * rand.nextDouble();
+//			double x1 = rand.nextInt(coordinateRange);
+//			double y1 = rand.nextInt(coordinateRange);
+//			double x2 = rand.nextInt(coordinateRange);
+//			double y2 = rand.nextInt(coordinateRange);
 			Point p1 = new Point(x1, y1);
 			Point p2 = new Point(x2, y2);
 			p1.setInteriorColor(Color.black);
 			p2.setInteriorColor(Color.black);
 			LineSegment segment = new LineSegment(p1, p2);
-
-			events[i] = new Event(segment.getLeftEndpoint(), segment, Event.Type.LEFT);
-			events[i+1] = new Event(segment.getRightEndpoint(), segment, Event.Type.RIGHT);
+			
+			geometryList.add(segment);
 		}
 		
-		System.out.println("Event Priority Queue:\n");
-		
-		EventQueue eq = new EventQueue(events);
-		while(!eq.isEmpty())
-		{
-			System.out.println(eq.removeMin());
-		}
-		eq = new EventQueue(events);
-		
-		//System.out.println(bst);
-		
-		//graphing
-		FrameDisplay frame = new FrameDisplay(frameWidth, frameHeight, geometryList);
+		// Graphing
+		frame = new FrameDisplay(frameWidth, frameHeight, geometryList);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
-//		while(!eq.isEmpty())
-//		{
-//			Event e = eq.removeMin();
-//			
-//			if (e.getEventType() == Event.Type.LEFT)
-//			{
-//				geometryList.add(e.getSegment());
-//			} else
-//			{
-//				geometryList.remove(e.getSegment());
-//			}
-//			
-//			frame.repaint();
-//			delay(500);
-//		}
-		
-		while(!eq.isEmpty())
+		ArrayList<LineSegment> segments = new ArrayList<>();
+		for (GeometricObject geometry : geometryList)
 		{
-			Event e = eq.removeMin();
-			
-			if (e.getEventType() == Event.Type.LEFT)
-			{
-				bst.add(e.getSegment(), e.getEventPoint());
-			} else
-			{
-				bst.remove(e.getSegment(), e.getEventPoint());
-			}
-			
-			System.out.println();
-			System.out.println(bst);
-			
-			if (!bst.isEmpty())
-			{
-				Node current = bst.getMinNode();
-				geometryList = new ArrayList<>(segmentCount);
-				frame.setGeometryList(geometryList);
-				while (current != null)
-				{
-					geometryList.add(current.getInfo());
-					current = current.getSuccessor();
-				}
-			} else
-			{
-				geometryList = new ArrayList<>(segmentCount);
-				frame.setGeometryList(geometryList);
-			}
-			frame.repaint();
-			delay(500);
+			segments.add((LineSegment)geometry);
 		}
+		
+		BentleyOttman bo = new BentleyOttman(segments);
+		bo.findIntersections();
+//		geometryList.addAll(bo.findIntersections());
+//		frame.repaint();
 	}
 	
 	/**
