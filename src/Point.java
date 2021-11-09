@@ -32,6 +32,17 @@ public class Point extends GeometricObject
 	}
 
 	@Override
+	public void draw(Graphics g)
+	{
+		int radius = 2;
+
+		g.setColor(getInteriorColor());
+		g.fillOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
+		g.setColor(getBoundaryColor());
+		g.drawOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
+	}
+
+	@Override
 	public boolean equals(Object other)
 	{
 		if (!(other instanceof Point))
@@ -75,16 +86,5 @@ public class Point extends GeometricObject
 	public String toString()
 	{
 		return "Point: (" + x + ", " + y + ")";
-	}
-
-	@Override
-	public void draw(Graphics g)
-	{
-		int radius = 3;
-        
-        g.setColor(getInteriorColor());
-        g.fillOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
-        g.setColor(getBoundaryColor());
-        g.drawOval((int) x - radius, (int) y - radius, 2 * radius, 2 * radius);
 	}
 }

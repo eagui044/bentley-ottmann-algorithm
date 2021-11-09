@@ -185,10 +185,11 @@ public class LineSegment extends GeometricObject
 				if (Math.abs(eventPoint.getY() - y) < Globals.POINT_EPSILON)
 				{
 					Point crossingPoint = this.getIntersectionPointWith(other);
-					double orientation = crossProductK(crossingPoint, thisRight, crossingPoint, otherRight);
 
 					if (crossingPoint != null && crossingPoint.equals(eventPoint))
 					{
+						double orientation = crossProductK(crossingPoint, thisRight, crossingPoint, otherRight);
+						
 						if (orientation <= 0.0)
 						{
 							return -1;
@@ -198,6 +199,8 @@ public class LineSegment extends GeometricObject
 						}
 					} else
 					{
+						double orientation = crossProductK(eventPoint, thisRight, eventPoint, otherRight);
+						
 						if (orientation <= 0.0)
 						{
 							return 1;

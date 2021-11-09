@@ -413,8 +413,6 @@ public class BinarySearchTree
 			}
 		} else
 		{ // If matching LineSegment is found.
-			// TODO delete after testing.
-			System.out.println("Found LineSegment: " + s);
 			
 			// Node with no child.
 			if (p.getLeftChild() == null && p.getRightChild() == null)

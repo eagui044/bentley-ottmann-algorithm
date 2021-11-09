@@ -7,7 +7,6 @@ public class Tester
 {
 	//TODO when done testing remove public static variables.
 	public static FrameDisplay frame;
-	public static ArrayList<GeometricObject> geometryList;
 	
 	public static void main(String[] args)
 	{
@@ -20,11 +19,13 @@ public class Tester
 		int frameWidth = 900;
 		int frameHeight = 900;
 		
-		Random rand = new Random();
-		int segmentCount = 100;
+		long seed = System.currentTimeMillis();
+		System.out.println("Tester Seed: " + seed);
+		Random rand = new Random(seed);
+		int segmentCount = 50;
 		int coordinateRange = 900;
 
-		geometryList = new ArrayList<>(segmentCount);
+		ArrayList<GeometricObject> geometricList = new ArrayList<>(segmentCount);
 
 		// Generate random line segments to insert into tree.
 		for (int i = 0; i < segmentCount*2; i += 2)
@@ -43,24 +44,23 @@ public class Tester
 			p2.setInteriorColor(Color.black);
 			LineSegment segment = new LineSegment(p1, p2);
 			
-			geometryList.add(segment);
+			geometricList.add(segment);
 		}
 		
 		// Graphing
-		frame = new FrameDisplay(frameWidth, frameHeight, geometryList);
+		frame = new FrameDisplay(frameWidth, frameHeight, geometricList);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
 		ArrayList<LineSegment> segments = new ArrayList<>();
-		for (GeometricObject geometry : geometryList)
+		for (GeometricObject geometry : geometricList)
 		{
 			segments.add((LineSegment)geometry);
 		}
 		
 		BentleyOttman bo = new BentleyOttman(segments);
-		bo.findIntersections();
-//		geometryList.addAll(bo.findIntersections());
-//		frame.repaint();
+		bo.findIntersections(10); // Set non-zero delay in ms to visualize sweep line algorithm progression.
+		frame.repaint();
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class Tester
 	 * 
 	 * @param ms milliseconds duration the thread will pause for
 	 */
-	public void delay(int ms)
+	public static void delay(int ms)
 	{
 		try
 		{
