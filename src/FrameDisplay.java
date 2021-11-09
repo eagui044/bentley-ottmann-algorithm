@@ -1,6 +1,10 @@
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * @author A. Hernandez
+ * @author E. Aguilar
+ */
 public class FrameDisplay extends JFrame
 {
 	/**

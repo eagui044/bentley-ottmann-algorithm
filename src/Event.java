@@ -1,4 +1,7 @@
 
+/**
+ * @author E. Aguilar
+ */
 public class Event
 {
 	public enum Type

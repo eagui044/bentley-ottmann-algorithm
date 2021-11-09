@@ -28,7 +28,7 @@ public class BinarySearchTree
 			Node first = new Node();
 			first.setNode(s, null, null, null, null, null);
 			root.setLeftChild(first);
-			
+
 			return first;
 		} else
 		{
@@ -129,7 +129,7 @@ public class BinarySearchTree
 	}
 
 	private Node findNode(LineSegment s, Point eventPoint, Node p)
-	{	
+	{
 		if (p == null)
 		{
 			return null;
@@ -137,7 +137,7 @@ public class BinarySearchTree
 		{
 			return p;
 		} else if (s.compareTo(p.getSegment(), eventPoint) == -1)
-		{		
+		{
 			return findNode(s, eventPoint, p.getLeftChild());
 		} else
 		{
@@ -302,7 +302,7 @@ public class BinarySearchTree
 				{
 					newChild.getSuccessor().setPredecessor(newChild);
 				}
-				
+
 				return newChild;
 			} else
 			{
@@ -328,7 +328,7 @@ public class BinarySearchTree
 				{
 					newChild.getSuccessor().setPredecessor(newChild);
 				}
-				
+
 				return newChild;
 			} else
 			{
@@ -364,7 +364,7 @@ public class BinarySearchTree
 
 	public void remove(LineSegment s, Point eventPoint)
 	{
-		//TODO Using findNode function might be redundant and unnecessary, test code without it.
+		// TODO Using findNode function might be redundant and unnecessary, test code without it.
 		Node p = findNode(s, eventPoint, root.getLeftChild());
 
 		if (p != null)
@@ -390,7 +390,7 @@ public class BinarySearchTree
 	}
 
 	private Node remove(LineSegment s, Point eventPoint, Node p)
-	{		
+	{
 		// If tree is empty.
 		if (p == null)
 		{
@@ -413,7 +413,7 @@ public class BinarySearchTree
 			}
 		} else
 		{ // If matching LineSegment is found.
-			
+
 			// Node with no child.
 			if (p.getLeftChild() == null && p.getRightChild() == null)
 			{
@@ -442,7 +442,7 @@ public class BinarySearchTree
 				{
 					p.getSuccessor().setPredecessor(p);
 				}
-				
+
 				// Remove the inorder successor.
 				p.setRightChild(remove(successor.getSegment(), eventPoint, p.getRightChild()));
 
@@ -473,6 +473,17 @@ public class BinarySearchTree
 		}
 	}
 
+	public void swapNodeInfo(Node p, Node q)
+	{
+		LineSegment temp = p.getSegment();
+
+		// Swapping p with q.
+		p.setSegment(q.getSegment());
+
+		// Swapping q with p.
+		q.setSegment(temp);
+	}
+
 	public String toString()
 	{
 		return toString(root.getLeftChild());
@@ -487,16 +498,5 @@ public class BinarySearchTree
 		{
 			return "";
 		}
-	}
-	
-	public void swapNodeInfo(Node p, Node q)
-	{
-		LineSegment temp = p.getSegment();
-		
-		// Swapping p with q.
-		p.setSegment(q.getSegment());
-		
-		// Swapping q with p.
-		q.setSegment(temp);
 	}
 }

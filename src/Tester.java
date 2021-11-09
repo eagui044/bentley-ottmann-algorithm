@@ -3,6 +3,9 @@ import java.util.Random;
 import javax.swing.JFrame;
 import java.awt.Color;
 
+/**
+ * @author E. Aguilar
+ */
 public class Tester
 {
 	//TODO when done testing remove public static variables.

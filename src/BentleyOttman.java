@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.Color;
 
+/**
+ * @author E. Aguilar
+ */
 public class BentleyOttman
 {
 	private Event[] events;
@@ -32,7 +35,7 @@ public class BentleyOttman
 		while (!eq.isEmpty())
 		{
 			Event event = eq.removeMin();
-			//System.out.println(sweepLine);
+			// System.out.println(sweepLine);
 
 			if (event.getEventType() == Event.Type.LEFT)
 			{
@@ -74,9 +77,9 @@ public class BentleyOttman
 
 			} else if (event.getEventType() == Event.Type.RIGHT)
 			{
-//				event.getSegment().setBoundaryColor(Color.red);
-//				Tester.frame.repaint();
-				
+				// event.getSegment().setBoundaryColor(Color.red);
+				// Tester.frame.repaint();
+
 				Node removed = sweepLine.findNode(event.getSegment(), event.getEventPoint());
 				Node above = removed.getSuccessor();
 				Node below = removed.getPredecessor();
@@ -93,7 +96,7 @@ public class BentleyOttman
 								Event.Type.INTERSECTION));
 					}
 				}
-				
+
 				event.getSegment().setBoundaryColor(Color.black);
 				Tester.frame.repaint();
 			} else

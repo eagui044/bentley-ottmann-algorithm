@@ -3,6 +3,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author A. Hernandez
+ * @author E. Aguilar
+ */
 public class GraphDisplay extends JPanel
 {
 	/**

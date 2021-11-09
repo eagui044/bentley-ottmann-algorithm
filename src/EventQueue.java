@@ -1,4 +1,8 @@
 
+/**
+ * @author E. Aguilar
+ * @author A. Hernandez
+ */
 public class EventQueue
 {
 	/**
@@ -144,7 +148,7 @@ public class EventQueue
 	}
 
 	public void deleteEventPoint(Point eventPoint)
-	{	
+	{
 		events[0] = null;
 		for (int i = 1; i <= length; i++)
 		{
@@ -156,9 +160,9 @@ public class EventQueue
 				}
 				for (int j = length; j < arraySize; j++)
 				{
-					events[j]= null;
+					events[j] = null;
 				}
-				
+
 				length--;
 
 				// Rebuild heap (rearranges array)
@@ -167,7 +171,7 @@ public class EventQueue
 				{
 					heapify(events, length, j);
 				}
-				
+
 				break;
 			}
 		}
