@@ -25,7 +25,7 @@ public class Tester
 		long seed = System.currentTimeMillis();
 		System.out.println("Tester Seed: " + seed);
 		Random rand = new Random(seed);
-		int segmentCount = 50;
+		int segmentCount = 100;
 		int coordinateRange = 900;
 
 		ArrayList<GeometricObject> geometricList = new ArrayList<>(segmentCount);
@@ -61,8 +61,8 @@ public class Tester
 			segments.add((LineSegment)geometry);
 		}
 		
-		BentleyOttman bo = new BentleyOttman(segments);
-		bo.findIntersections(10); // Set non-zero delay in ms to visualize sweep line algorithm progression.
+		BentleyOttmann bo = new BentleyOttmann(segments);
+		bo.findIntersections(5); // Set non-zero delay in ms to visualize sweep line algorithm progression.
 		frame.repaint();
 	}
 	

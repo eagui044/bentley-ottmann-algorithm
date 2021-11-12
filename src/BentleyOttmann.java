@@ -5,13 +5,13 @@ import java.awt.Color;
 /**
  * @author E. Aguilar
  */
-public class BentleyOttman
+public class BentleyOttmann
 {
 	private Event[] events;
 	private EventQueue eq;
 	private BinarySearchTree sweepLine;
 
-	public BentleyOttman(List<LineSegment> segments)
+	public BentleyOttmann(List<LineSegment> segments)
 	{
 		int segmentCount = segments.size();
 		events = new Event[segmentCount * 2];
